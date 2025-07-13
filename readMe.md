@@ -1,3 +1,5 @@
+按照如下目录格式创建目录
+
 ├── docker-compose.yml
 ├── keeper
 │   ├── config.xml
