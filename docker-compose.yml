@@ -1,0 +1,110 @@
+version: '2.4'
+
+services:
+  # ClickHouse Keeper 节点 (用于协调和管理集群)
+  clickhouse-keeper-1:
+    image: clickhouse/clickhouse-keeper:latest
+    container_name: clickhouse-keeper-1
+    volumes:
+      - ./keeper/config.xml:/etc/clickhouse-keeper/keeper_config.xml
+      - ./keeper/logs:/var/log/clickhouse-keeper
+      - ./keeper/data:/var/lib/clickhouse-keeper
+    ports:
+      - "8191:8191" # Keeper 客户端端口
+      - "9181:9181" # Keeper 服务端端口
+    networks:
+      - clickhouse-net
+    environment:
+      MY_KEEPER_ID: 1
+      KEEPER_CONF_FILE: /etc/clickhouse-keeper/keeper_config.xml
+
+  clickhouse-keeper-2:
+    image: clickhouse/clickhouse-keeper:latest
+    container_name: clickhouse-keeper-2
+    volumes:
+      - ./keeper/config.xml:/etc/clickhouse-keeper/keeper_config.xml
+      - ./keeper/logs:/var/log/clickhouse-keeper
+      - ./keeper/data:/var/lib/clickhouse-keeper
+    ports:
+      - "8192:8191"
+      - "9182:9181"
+    networks:
+      - clickhouse-net
+    environment:
+      MY_KEEPER_ID: 2
+      KEEPER_CONF_FILE: /etc/clickhouse-keeper/keeper_config.xml
+
+  clickhouse-keeper-3:
+    image: clickhouse/clickhouse-keeper:latest
+    container_name: clickhouse-keeper-3
+    volumes:
+      - ./keeper/config.xml:/etc/clickhouse-keeper/keeper_config.xml
+      - ./keeper/logs:/var/log/clickhouse-keeper
+      - ./keeper/data:/var/lib/clickhouse-keeper
+    ports:
+      - "8193:8191"
+      - "9183:9181"
+    networks:
+      - clickhouse-net
+    environment:
+      MY_KEEPER_ID: 3
+      KEEPER_CONF_FILE: /etc/clickhouse-keeper/keeper_config.xml
+
+  # ClickHouse 节点
+  clickhouse-node-1:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse-node-1
+    volumes:
+      - ./clickhouse/node1/config.xml:/etc/clickhouse-server/config.xml
+      - ./clickhouse/node1/users.xml:/etc/clickhouse-server/users.xml
+      - ./clickhouse/node1/logs:/var/log/clickhouse-server
+      - ./clickhouse/node1/data:/var/lib/clickhouse
+    ports:
+      - "8123:8123" # HTTP 接口
+      - "9000:9000" # 原生客户端接口
+    networks:
+      - clickhouse-net
+    depends_on:
+      - clickhouse-keeper-1
+      - clickhouse-keeper-2
+      - clickhouse-keeper-3
+
+  clickhouse-node-2:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse-node-2
+    volumes:
+      - ./clickhouse/node2/config.xml:/etc/clickhouse-server/config.xml
+      - ./clickhouse/node2/users.xml:/etc/clickhouse-server/users.xml
+      - ./clickhouse/node2/logs:/var/log/clickhouse-server
+      - ./clickhouse/node2/data:/var/lib/clickhouse
+    ports:
+      - "8124:8123"
+      - "9001:9000"
+    networks:
+      - clickhouse-net
+    depends_on:
+      - clickhouse-keeper-1
+      - clickhouse-keeper-2
+      - clickhouse-keeper-3
+
+  clickhouse-node-3:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse-node-3
+    volumes:
+      - ./clickhouse/node3/config.xml:/etc/clickhouse-server/config.xml
+      - ./clickhouse/node3/users.xml:/etc/clickhouse-server/users.xml
+      - ./clickhouse/node3/logs:/var/log/clickhouse-server
+      - ./clickhouse/node3/data:/var/lib/clickhouse
+    ports:
+      - "8125:8123"
+      - "9002:9000"
+    networks:
+      - clickhouse-net
+    depends_on:
+      - clickhouse-keeper-1
+      - clickhouse-keeper-2
+      - clickhouse-keeper-3
+
+networks:
+  clickhouse-net:
+    driver: bridge

@@ -1,0 +1,71 @@
+<yandex>
+    <logger>
+        <level>information</level>
+        <console>true</console>
+    </logger>
+
+    <listen_host>::</listen_host>
+    <tcp_port>9000</tcp_port>
+    <http_port>8123</http_port>
+
+    <zookeeper>
+        <node>
+            <host>clickhouse-keeper-1</host>
+            <port>9181</port>
+        </node>
+        <node>
+            <host>clickhouse-keeper-2</host>
+            <port>9181</port>
+        </node>
+        <node>
+            <host>clickhouse-keeper-3</host>
+            <port>9181</port>
+        </node>
+        <session_timeout_ms>30000</session_timeout_ms>
+    </zookeeper>
+
+    <macros>
+        <shard>03</shard>
+        <replica>clickhouse-node-3</replica>
+    </macros>
+
+    <cluster>
+        <default_cluster>
+            <shard>
+                <internal_replication>true</internal_replication>
+                <replica>
+                    <host>clickhouse-node-1</host>
+                    <port>9000</port>
+                </replica>
+                <replica>
+                    <host>clickhouse-node-2</host>
+                    <port>9000</port>
+                </replica>
+            </shard>
+            <shard>
+                <internal_replication>true</internal_replication>
+                <replica>
+                    <host>clickhouse-node-2</host>
+                    <port>9000</port>
+                </replica>
+                <replica>
+                    <host>clickhouse-node-3</host>
+                    <port>9000</port>
+                </replica>
+            </shard>
+            <shard>
+                <internal_replication>true</internal_replication>
+                <replica>
+                    <host>clickhouse-node-3</host>
+                    <port>9000</port>
+                </replica>
+                <replica>
+                    <host>clickhouse-node-1</host>
+                    <port>9000</port>
+                </replica>
+            </shard>
+        </default_cluster>
+    </cluster>
+
+    <include_from>/etc/clickhouse-server/users.xml</include_from>
+</yandex>

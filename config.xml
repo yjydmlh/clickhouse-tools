@@ -1,0 +1,38 @@
+<clickhouse-keeper>
+    <logger>
+        <level>information</level>
+        <console>true</console>
+    </logger>
+
+    <server>
+        <client_port>8191</client_port>
+        <server_port>9181</server_port>
+    </server>
+
+    <auto_create_tables>true</auto_create_tables>
+
+    <raft>
+        <snapshots_retain>3</snapshots_retain>
+        <snapshot_distance>100000</snapshot_distance>
+        <log_sync_period>500</log_sync_period>
+        <quorum_have_participant_member>true</quorum_have_participant_member>
+
+        <members>
+            <member>
+                <id>1</id>
+                <host>clickhouse-keeper-1</host>
+                <port>9181</port>
+            </member>
+            <member>
+                <id>2</id>
+                <host>clickhouse-keeper-2</host>
+                <port>9181</port>
+            </member>
+            <member>
+                <id>3</id>
+                <host>clickhouse-keeper-3</host>
+                <port>9181</port>
+            </member>
+        </members>
+    </raft>
+</clickhouse-keeper>
